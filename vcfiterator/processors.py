@@ -38,9 +38,9 @@ class BaseInfoProcessor(object, metaclass=abc.ABCMeta):
     def getConvertFunction(self, meta, key):
         # Search for meta item
         f = next((m for m in meta['INFO'] if m['ID'] == key), None)
-        func = lambda x: x.decode('latin-1', 'replace')
+        func = lambda x: x
         if f:
-            parse_func = Util.dot_to_none(lambda x: x.decode('latin-1', 'replace'))
+            parse_func = Util.dot_to_none(lambda x: x)
             if f['Type'] == 'Integer':
                 parse_func = Util.dot_to_none(int)
             elif f['Type'] in ['Number', 'Double', 'Float']:
@@ -126,7 +126,7 @@ class VEPInfoProcessor(BaseInfoProcessor):
 
         all_data = [
             {
-                k: self.converters.get(k, lambda x: x.decode('latin-1', 'replace'))(v) for k, v in zip(self.fields, t.split('|')) if v is not ''
+                k: self.converters.get(k, lambda x: x)(v) for k, v in zip(self.fields, t.split('|')) if v is not ''
             } for t in transcripts
         ]
 
@@ -184,7 +184,7 @@ class SnpEffInfoProcessor(BaseInfoProcessor):
 
         all_data = [
             {
-                k: self.converters.get(k, lambda x: x.decode('latin-1', 'replace'))(v) for k, v in zip(self.fields, self._parseFormat(t)) if v is not ''
+                k: self.converters.get(k, lambda x: x)(v) for k, v in zip(self.fields, self._parseFormat(t)) if v is not ''
             } for t in transcripts
         ]
 
