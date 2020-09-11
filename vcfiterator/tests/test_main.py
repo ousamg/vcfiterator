@@ -1,5 +1,5 @@
 import unittest
-from StringIO import StringIO
+from io import StringIO
 
 from vcfiterator import VcfIterator
 
@@ -43,7 +43,7 @@ class TestHeaderParser(unittest.TestCase):
 
     def test_get_samples(self):
         vi = VcfIterator(get_vcf_file_obj(None))
-        self.assertEquals(
+        self.assertEqual(
             vi.getSamples(),
             ['TESTSAMPLE1', 'TESTSAMPLE2', 'TESTSAMPLE3']
         )
@@ -51,7 +51,7 @@ class TestHeaderParser(unittest.TestCase):
     def test_meta_parsing(self):
         vi = VcfIterator(get_vcf_file_obj(None))
         meta = vi.getMeta()
-        self.assertEquals(
+        self.assertEqual(
             meta['FORMAT'],
             [
                 {
@@ -91,13 +91,13 @@ class TestDataParser(unittest.TestCase):
 
     def test_general_parsing(self):
         data = self.get_data()
-        self.assertEquals(data['CHROM'], '20')
-        self.assertEquals(data['POS'], 14370)
-        self.assertEquals(data['ID'], 'rs6054257')
-        self.assertEquals(data['REF'], 'G')
-        self.assertEquals(data['ALT'], ['A'])
-        self.assertEquals(data['QUAL'], 29)
-        self.assertEquals(data['FILTER'], 'PASS')
+        self.assertEqual(data['CHROM'], '20')
+        self.assertEqual(data['POS'], 14370)
+        self.assertEqual(data['ID'], 'rs6054257')
+        self.assertEqual(data['REF'], 'G')
+        self.assertEqual(data['ALT'], ['A'])
+        self.assertEqual(data['QUAL'], 29)
+        self.assertEqual(data['FILTER'], 'PASS')
 
     def test_sample_parsing(self):
         data = self.get_data()
@@ -105,7 +105,7 @@ class TestDataParser(unittest.TestCase):
         self.assertIn('TESTSAMPLE2', data['SAMPLES'])
         self.assertIn('TESTSAMPLE3', data['SAMPLES'])
 
-        self.assertEquals(
+        self.assertEqual(
             data['SAMPLES']['TESTSAMPLE1'],
             {
                 'GT': '0|0',
@@ -115,7 +115,7 @@ class TestDataParser(unittest.TestCase):
             }
         )
 
-        self.assertEquals(
+        self.assertEqual(
             data['SAMPLES']['TESTSAMPLE2'],
             {
                 'GT': '1|0',
@@ -125,7 +125,7 @@ class TestDataParser(unittest.TestCase):
             }
         )
 
-        self.assertEquals(
+        self.assertEqual(
             data['SAMPLES']['TESTSAMPLE3'],
             {
                 'GT': '1/1',

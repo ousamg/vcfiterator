@@ -3,9 +3,7 @@ import abc
 from vcfiterator.util import Util
 
 
-class BaseInfoProcessor(object):
-
-    __metaclass__ = abc.ABCMeta
+class BaseInfoProcessor(object, metaclass=abc.ABCMeta):
 
     def __init__(self, meta):
         self.meta = meta

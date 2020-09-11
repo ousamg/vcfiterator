@@ -47,7 +47,7 @@ class HeaderParser(object):
         Checks whether input was a path or an open file object.
         In either case, return an open file object.
         """
-        if isinstance(self.path_or_f, basestring):
+        if isinstance(self.path_or_f, str):
             f = open(self.path_or_f)
             return f
         self.path_or_f.seek(0)
@@ -59,7 +59,7 @@ class HeaderParser(object):
 
         # Read in metadata and header
         f = self._get_file_obj()
-        for line in f.xreadlines():
+        for line in f:
             line = line.replace('\n', '')
             if line.startswith('##'):
                 key, value = line[2:].split('=', 1)
@@ -72,13 +72,13 @@ class HeaderParser(object):
                 break
 
         # Extract data with processors
-        for key, func in self.metaProccessors.iteritems():
+        for key, func in self.metaProccessors.items():
             if key in meta:
                 for idx, value in enumerate(meta[key]):
                     meta[key][idx] = func(value)
 
         # Extract value from single-item lists ([val] -> val):
-        for k, v in meta.iteritems():
+        for k, v in meta.items():
             if len(v) == 1:
                 meta[k] = v[0]
 
@@ -161,7 +161,7 @@ class DataParser(object):
         Checks whether input was a path or an open file object.
         In either case, return an open file object.
         """
-        if isinstance(self.path_or_f, basestring):
+        if isinstance(self.path_or_f, str):
             f = open(self.path_or_f)
             return f
         self.path_or_f.seek(0)
@@ -189,7 +189,7 @@ class DataParser(object):
         found_data_start = False
         f = self._get_file_obj()
         try:
-            for line_idx, line in enumerate(f.xreadlines()):
+            for line_idx, line in enumerate(f):
                 # Skip header, wait for #CHROM to signal start of data
                 if line.startswith('#CHROM') and not found_data_start:
                     found_data_start = True

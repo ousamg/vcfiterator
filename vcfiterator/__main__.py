@@ -16,4 +16,4 @@ for value in v.iter():
     kw = {}
     if args.pretty:
         kw['indent'] = 4
-    print json.dumps(value, **kw)
+    print(json.dumps(value, **kw))
