@@ -91,11 +91,13 @@ class HeaderParser(object):
 
 class DataParser(object):
 
-    def __init__(self, path_or_f, meta, header, samples):
+    def __init__(self, path_or_f, meta, header, samples, hap2dip, nophase):
         self.path_or_f = path_or_f
         self.meta = meta
         self.header = header
         self.samples = samples
+        self.hap2dip = hap2dip
+        self.nophase = nophase
 
         self.infoProcessors = list()
         self.fallbackProcessor = NativeInfoProcessor(meta)
@@ -144,13 +146,27 @@ class DataParser(object):
 
         sample_format = data['FORMAT'].split(':')
 
-        samples = dict()
+        samples = defaultdict(dict)
+
         extract = Util.split_and_convert(Util.conv_to_number, extract_single=True)
+
         for sample_name in self.samples:
+
             sample_text = data.pop(sample_name)
-            samples[sample_name] = {
-                k: extract(v) for k, v in zip(sample_format, sample_text.split(':'))
-            }
+
+            for k, v in zip(sample_format, sample_text.split(':')):
+                # handling GT phasing and haploid GT
+                if k == 'GT':
+                    # remove phasing
+                    if self.nophase and '|' in v:
+                        v = v.replace('|', '/')
+                    # change haploid GT to diploid GT, e.g. '1' to '1/1', '.' to './.'
+                    if self.hap2dip and len(v) == 1:
+                        v = v + '/' + v
+
+                    samples[sample_name][k] = v  # haploid GT not converted to number
+                else:
+                    samples[sample_name][k] = extract(v)
 
         data['SAMPLES'] = samples
 
@@ -214,10 +230,12 @@ class DataParser(object):
 
 class VcfIterator(object):
 
-    def __init__(self, path_or_f):
+    def __init__(self, path_or_f, hap2dip=False, nophase=False):
         self.path_or_f = path_or_f
         self.meta, self.header, self.samples = HeaderParser(self.path_or_f).parse()
-        self.data_parser = DataParser(self.path_or_f, self.meta, self.header, self.samples)
+        self.hap2dip = hap2dip
+        self.nophase = nophase
+        self.data_parser = DataParser(self.path_or_f, self.meta, self.header, self.samples, self.hap2dip, self.nophase)
 
         # Add by default
         self.addInfoProcessor(CsvAlleleParser)
